@@ -1,0 +1,148 @@
+Documentación del Proyecto: API CRUD Backend
+Descripción General
+Este proyecto implementa una API RESTful para gestionar tareas (CRUD), desarrollado con Node.js, TypeScript y Express.js. La API permite crear, leer, actualizar y eliminar tareas, siguiendo patrones de diseño como Factory y Facade, y simulando una base de datos en memoria.
+Repositorio del proyecto: https://github.com/FranFerrer3d/prueba_back/tree/main
+
+Funcionalidades
+Endpoints CRUD
+Crear una nueva tarea
+Método: POST
+Endpoint: /tasks
+Body:
+{
+  "title": "Título de la tarea",
+  "description": "Descripción de la tarea"
+}
+Respuesta:
+{
+  "id": "unique-id",
+  "title": "Título de la tarea",
+  "description": "Descripción de la tarea",
+  "createdAt": "2025-01-07T18:00:00.000Z"
+}
+Obtener todas las tareas
+Método: GET
+Endpoint: /tasks
+Respuesta:
+[
+  {
+    "id": "unique-id",
+    "title": "Título",
+    "description": "Descripción",
+    "createdAt": "2025-01-07T18:00:00.000Z"
+  }
+]
+Obtener una tarea por ID
+Método: GET
+Endpoint: /tasks/:id
+Respuesta:
+{
+  "id": "unique-id",
+  "title": "Título",
+  "description": "Descripción",
+  "createdAt": "2025-01-07T18:00:00.000Z"
+}
+Actualizar una tarea
+Método: PUT
+Endpoint: /tasks/:id
+Body:
+{
+  "title": "Nuevo título",
+  "description": "Nueva descripción"
+}
+Respuesta:
+{
+  "id": "unique-id",
+  "title": "Nuevo título",
+  "description": "Nueva descripción",
+  "createdAt": "2025-01-07T18:00:00.000Z"
+}
+Eliminar una tarea
+Método: DELETE
+Endpoint: /tasks/:id
+Respuesta:
+{
+  "message": "Task deleted successfully."
+}
+
+Patrones de Diseño
+1. Factory
+Encapsula la lógica de creación de tareas. Implementado en TaskFactory para generar tareas con un ID único y fecha de creación:
+export class TaskFactory {
+  static createTask(title: string, description: string): Task {
+    return {
+      id: uuidv4(),
+      title,
+      description,
+      createdAt: new Date(),
+    };
+  }
+}
+2. Facade
+Centraliza la lógica de negocio en una capa para evitar acoplamiento en los controladores. Implementado en TaskFacade:
+export class TaskFacade {
+  private taskService = new TaskService();
+
+  createTask(data: { title: string; description: string }): Task {
+    const task = TaskFactory.createTask(data.title, data.description);
+    return this.taskService.createTask(task);
+  }
+
+  // Otros métodos: getAllTasks, getTaskById, updateTask, deleteTask...
+}
+
+Manejo de Errores
+Validaciones:
+El título y la descripción deben estar presentes al crear o actualizar tareas.
+Respuestas HTTP adecuadas: 400 para solicitudes inválidas, 404 para recursos no encontrados.
+Middleware:
+Implementado para capturar errores y responder con mensajes claros.
+
+Testing
+Se implementaron pruebas unitarias y de integración utilizando Jest y Supertest:
+Pruebas Unitarias:
+TaskService: Testea la lógica de negocio.
+Pruebas de Integración:
+TaskRoutes: Verifica que los endpoints funcionen correctamente.
+Comando para ejecutar los tests:
+npx jest
+Resultado esperado:
+PASS  src/services/__tests__/TaskService.test.ts
+PASS  src/routes/__tests__/TaskRoutes.test.ts
+
+Test Suites: 2 passed, 2 total
+Tests:       12 passed, 12 total
+
+Documentación con Swagger
+La API está documentada con Swagger. Accede a la documentación interactiva en:
+http://localhost:3000/api-docs
+Ejemplo de definición en swagger.ts:
+openapi: "3.0.0",
+info: {
+  title: "API CRUD Backend",
+  version: "1.0.0",
+},
+paths: {
+  "/tasks": {
+    get: { summary: "Obtener todas las tareas" },
+    post: { summary: "Crear una tarea" },
+  },
+}
+
+Cómo Ejecutar el Proyecto
+Clonar el repositorio:
+git clone https://github.com/FranFerrer3d/prueba_back/tree/main
+cd api-crud-backend
+Instalar dependencias:
+npm install
+Ejecutar el servidor en modo desarrollo:
+npm run dev
+Probar los endpoints con Postman o la documentación Swagger.
+
+Resumen Final
+El proyecto demuestra:
+Uso de Node.js y TypeScript.
+Implementación de patrones de diseño (Factory y Facade).
+Manejo adecuado de errores y validaciones.
+Documentación con Swagger y pruebas con Jest.
+
